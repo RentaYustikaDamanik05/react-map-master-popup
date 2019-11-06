@@ -42,6 +42,7 @@ import _PENANAMAN from '../common/commonDatas/_peNanaman'
 import _PEMELIHARAAN from '../common/commonDatas/_peMeliharaan';
 import _PW from '../common/commonDatas/_PatroliWilayah';
 import _PJ from '../common/commonDatas/_patroliJalur';
+import loaderGif from '../assets/loader/Rolling.gif'
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -106,8 +107,8 @@ export default class Apps extends Component {
       TP : false,
       JP : false,
 
-
-
+      //untuk state loader
+      loaderStater : false
     };
   }
   switchChange = name => event => {
@@ -145,8 +146,13 @@ export default class Apps extends Component {
     })
   }
 
+  myCallback = (loaderStatus) => {
+    this.setState({loaderState: loaderStatus});
+  }
+
   render() {
     const position = [this.state.location.lat, this.state.location.lng]
+
     return (
 
       <div>
@@ -161,9 +167,12 @@ export default class Apps extends Component {
               accessToken="pk.eyJ1IjoiYWdhbXBhbmdsYWgiLCJhIjoiY2swYXVlbWRnMGxvajNncGltMXh6dXE2aiJ9.-Y3nTDMgScp10P-g9LpQ-A" />
             <ScaleControl position='bottomright' />
             <ZoomControl position="bottomright" />
+            <div style={{zIndex:"9999px", justifyContent: 'center', alignItems: 'center'}}>
+                        <img  src={loaderGif} />
+                    </div>
             {this.state.BD2 ? <_Bd2 /> : null}
             {this.state.BD1 ? <_BG /> : null}
-            {this.state.tagunEks ? <_TagunEks /> : null}
+            {this.state.tagunEks ? <_TagunEks /> : null} 
             {this.state.tagunRen ? <_TagunRen /> : null}
             {this.state.FKH ? <_Fkh /> : null}
             {this.state.PL2011 ? <_PL2011 /> : null}

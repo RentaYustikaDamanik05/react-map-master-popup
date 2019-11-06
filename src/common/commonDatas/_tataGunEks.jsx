@@ -1,26 +1,33 @@
 import React from 'react';
 import {  Popup, Tooltip, GeoJSON } from 'react-leaflet'
 import Axios from 'axios'
+import loaderGif from '../../assets/loader/Rolling.gif'
 
 class _TagunEks extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             Taguneks: [],
+            loaderStat: true,
         }
     }
     componentDidMount() {
         Axios
             .get('http://forclime.agrisoft-cb.com:5002/data/plup_tatagunalahan')
             .then(response => {
-                this.setState(
-                    { Taguneks: response.data.features }
-                );
+                this.setState({
+                    Taguneks: response.data.features, 
+                    // loaderStat: false
+                });
                 console.log('data product dari axios', response.data.features)
+                console.log('loaderStat: ', this.state.loaderStat)
             })
     }
 
-
+    // sendData = () => {
+    //     this.props.parentCallback= this.state.loaderStat
+    // }
+    
     render() {
         let obTaguneks = this.state.Taguneks
         //  console.log("data", obTaguneks.properties.kode_lc)
@@ -92,79 +99,84 @@ class _TagunEks extends React.Component {
         event.target.setStyle(PLStyle);
         // event.target.bringToFront();
     }
-    
+        let data;
+        console.log('this.state.loaderStat: ',this.state.loaderStat)
+        if(this.state.loaderStat) {
+            // data =  <div style={{zIndex:"9999px", justifyContent: 'center', alignItems: 'center'}}>
+            //             <img  src={loaderGif} />
+            //         </div>
+        } else {
+            data = <div>
+            {obTaguneks.map((datas, index)=> {
+                   let dataValues = null;
+                   let currName = datas.properties.lu_eks;
+                   let show = true;
+                   this.props.excludeDesa && this.props.excludeDesa.forEach(datas => { if (currName === datas) show = false });
+                   
+                   return (
+                    <div key={index}>
+                        <GeoJSON
+                            data={datas}
+                            style={PLStyle}
+                            onmouseover={event => handleMouseEnter(event)
+                            }
+                            onmouseout={event => handleMouseLeave(event)}
+                             >
 
-        return (
-            <div>
-                {obTaguneks.map((datas, index)=> {
-                       let dataValues = null;
-                       let currName = datas.properties.lu_eks;
-                       let show = true;
-                       this.props.excludeDesa && this.props.excludeDesa.forEach(datas => { if (currName === datas) show = false });
-
-                       
-                       return (
-                        <div key={index}>
-                            <GeoJSON
-                                data={datas}
-                                style={PLStyle}
-                                onmouseover={event => handleMouseEnter(event)
-                                }
-                                onmouseout={event => handleMouseLeave(event)}
-                                 >
-
-                               <div  key={datas.properties.lu_eks}>
-                              
-                                <Popup  >
+                           <div  key={datas.properties.lu_eks}>
+                          
+                            <Popup  >
+                            
+                            <table className='table table-hover'> 
+                                    <tr> 
+                                        <td><b>Lahan Eksiting</b></td> 
+                                        <td> {datas.properties.lu_eks}  </td > 
+                                    </tr><tr> 
+                                        <td><b>Fungsi Kawasan</b></td> 
+                                        <td>  {datas.properties.fungsi_kawasan} </td > 
+                                    </tr><tr> 
+                                        <td><b>Desa</b></td> 
+                                        <td>{datas.properties.desa} </td > 
+                                    </tr><tr> 
+                                        <td><b>Luas</b></td> 
+                                        <td> {datas.properties.luas}</td > 
+                                    </tr><tr> 
+                                        <td><b>Keterangan</b></td> 
+                                        <td>{datas.properties.keterangan}</td > 
+                                    </tr><tr> 
+                                        <td><b>Landcover</b></td> 
+                                        <td>{datas.properties.landcover}</td > 
+                                    </tr><tr> 
+                                        <td><b>Perencanaan Planning</b></td> 
+                                        <td>{datas.properties.lu_plan}</td > 
+                                    </tr>
+                                </table>
                                 
-                                <table className='table table-hover'> 
-                                        <tr> 
-                                            <td><b>Lahan Eksiting</b></td> 
-                                            <td> {datas.properties.lu_eks}  </td > 
-                                        </tr><tr> 
-                                            <td><b>Fungsi Kawasan</b></td> 
-                                            <td>  {datas.properties.fungsi_kawasan} </td > 
-                                        </tr><tr> 
-                                            <td><b>Desa</b></td> 
-                                            <td>{datas.properties.desa} </td > 
-                                        </tr><tr> 
-                                            <td><b>Luas</b></td> 
-                                            <td> {datas.properties.luas}</td > 
-                                        </tr><tr> 
-                                            <td><b>Keterangan</b></td> 
-                                            <td>{datas.properties.keterangan}</td > 
-                                        </tr><tr> 
-                                            <td><b>Landcover</b></td> 
-                                            <td>{datas.properties.landcover}</td > 
-                                        </tr><tr> 
-                                            <td><b>Perencanaan Planning</b></td> 
-                                            <td>{datas.properties.lu_plan}</td > 
-                                        </tr>
-                                    </table>
-                                    
-                                </Popup>
-                              
-                                 </div>
-                                <div> 
-                                {
-                                        this.props.tooltip === undefined || this.props.tooltip ?
-                                            <Tooltip key={index} sticky={this.props.tooltipSticky ? this.props.tooltipSticky : true}>
-                                                <div>
-                                                    <div>{currName}</div>
-                                                </div>
-                                            </Tooltip>
-                                            :
-                                            null
-                                    }
-                                </div>
+                            </Popup>
+                          
+                             </div>
+                            <div> 
+                            {
+                                    this.props.tooltip === undefined || this.props.tooltip ?
+                                        <Tooltip key={index} sticky={this.props.tooltipSticky ? this.props.tooltipSticky : true}>
+                                            <div>
+                                                <div>{currName}</div>
+                                            </div>
+                                        </Tooltip>
+                                        :
+                                        null
+                                }
+                            </div>
 
-                            </GeoJSON>
-                        </div>
-                    )
-                })}
-            </div>
-
-            
+                        </GeoJSON>
+                    </div>
+                )
+            })}
+        </div>
+        }
+        
+        return (
+            <div>{data}</div>         
         )
     }
 
